@@ -25,7 +25,7 @@ async function run() {
     console.log("Connected to MongoDB");
 
     const db = client.db("smart_deals_db");
-    const productsCollection = db.collection("products");
+    const productCollection = db.collection("products");
 
     app.get("/", async (req, res) => {
       res.json({ message: "Hello World!" });
