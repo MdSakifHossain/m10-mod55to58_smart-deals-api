@@ -27,6 +27,14 @@ async function run() {
     const db = client.db("smart_deals_db");
     const productCollection = db.collection("products");
     const userCollection = db.collection("users");
+    const bidCollection = db.collection("bids");
+
+    // BIDS:POST
+    app.post("/bids", async (req, res) => {
+      const newBid = req.body;
+      const result = await bidCollection.insertOne(newBid);
+      res.json(result);
+    });
 
     // PRODUCTS:POST
     app.post("/products", async (req, res) => {
