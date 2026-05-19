@@ -26,11 +26,19 @@ async function run() {
 
     const db = client.db("smart_deals_db");
     const productCollection = db.collection("products");
+    const userCollection = db.collection("users");
 
     // PRODUCTS:POST
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
       const result = await productCollection.insertOne(newProduct);
+      res.json(result);
+    });
+
+    // USERS:POST
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      const result = await userCollection.insertOne(newUser);
       res.json(result);
     });
 
