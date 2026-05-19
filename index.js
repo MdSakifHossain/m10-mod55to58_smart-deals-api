@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { MongoClient, ServerApiVersion } from "mongodb";
+import logger from "./lib/logger.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -22,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    console.log("Connected to MongoDB");
+    logger("Connected to MongoDB");
 
     const db = client.db("smart_deals_db");
     const userCollection = db.collection("users");
@@ -62,5 +63,5 @@ async function run() {
 run().catch(console.dir);
 
 app.listen(port, () => {
-  console.log(`It's alive on port: ${port}`);
+  logger(`It's alive on port: ${port}`);
 });
