@@ -29,21 +29,27 @@ async function run() {
     const userCollection = db.collection("users");
     const bidCollection = db.collection("bids");
 
-    // BIDS:POST
+    /**
+     * POST /bids
+     * */
     app.post("/bids", async (req, res) => {
       const newBid = req.body;
       const result = await bidCollection.insertOne(newBid);
       res.json(result);
     });
 
-    // PRODUCTS:POST
+    /**
+     * POST /products
+     * */
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
       const result = await productCollection.insertOne(newProduct);
       res.json(result);
     });
 
-    // USERS:POST
+    /**
+     * POST /users
+     * */
     app.post("/users", async (req, res) => {
       const newUser = req.body;
       const result = await userCollection.insertOne(newUser);
