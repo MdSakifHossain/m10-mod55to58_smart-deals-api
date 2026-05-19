@@ -49,10 +49,6 @@ async function run() {
       const result = await userCollection.insertOne(newUser);
       res.json(result);
     });
-
-    app.get("/", async (req, res) => {
-      res.json({ message: "Hello World!" });
-    });
   } finally {
     // await client.close();
   }
