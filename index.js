@@ -25,16 +25,16 @@ async function run() {
     console.log("Connected to MongoDB");
 
     const db = client.db("smart_deals_db");
-    const productCollection = db.collection("products");
     const userCollection = db.collection("users");
+    const productCollection = db.collection("products");
     const bidCollection = db.collection("bids");
 
     /**
-     * POST /bids
+     * POST /users
      * */
-    app.post("/bids", async (req, res) => {
-      const newBid = req.body;
-      const result = await bidCollection.insertOne(newBid);
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      const result = await userCollection.insertOne(newUser);
       res.json(result);
     });
 
@@ -48,11 +48,11 @@ async function run() {
     });
 
     /**
-     * POST /users
+     * POST /bids
      * */
-    app.post("/users", async (req, res) => {
-      const newUser = req.body;
-      const result = await userCollection.insertOne(newUser);
+    app.post("/bids", async (req, res) => {
+      const newBid = req.body;
+      const result = await bidCollection.insertOne(newBid);
       res.json(result);
     });
   } finally {
