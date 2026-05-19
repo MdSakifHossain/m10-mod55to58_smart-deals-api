@@ -27,6 +27,13 @@ async function run() {
     const db = client.db("smart_deals_db");
     const productCollection = db.collection("products");
 
+    // PRODUCTS:POST
+    app.post("/products", async (req, res) => {
+      const newProduct = req.body;
+      const result = await productCollection.insertOne(newProduct);
+      res.json(result);
+    });
+
     app.get("/", async (req, res) => {
       res.json({ message: "Hello World!" });
     });
