@@ -36,7 +36,7 @@ export default logger;
 
 ## The Actual Thing
 
-> Notice: You **DO NOT NEED TO SANITIZE, VALIDATE ANY DATA COMING FROM THE CLIENT**. Just **Assume** that **Whatever CLIENT is sending is LEGIT** 
+> Notice: You **DO NOT NEED TO SANITIZE, VALIDATE ANY DATA COMING FROM THE CLIENT**. Just **Assume** that **Whatever CLIENT is sending is LEGIT**
 
 - [ ] create `db` && `collections`
 
