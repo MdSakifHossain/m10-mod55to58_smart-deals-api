@@ -36,4 +36,53 @@ export default logger;
 
 ## The Actual Thing
 
-- [ ] note down the actual thing
+- [ ] create `db` && `collections`
+
+```js
+// create DB
+const db = client.db("smart_deals_db");
+
+// create Collections
+const userCollection = db.collection("users");
+const productCollection = db.collection("products");
+const bidCollection = db.collection("bids");
+```
+
+- [ ] Create `POST /users` endpoint
+
+```js
+/**
+ * POST /users
+ * */
+app.post("/users", async (req, res) => {
+  const newUser = req.body;
+  const result = await userCollection.insertOne(newUser);
+  res.json(result);
+});
+```
+
+- [ ] Create `POST /products` endpoint
+
+```js
+/**
+ * POST /products
+ * */
+app.post("/products", async (req, res) => {
+  const newProduct = req.body;
+  const result = await productCollection.insertOne(newProduct);
+  res.json(result);
+});
+```
+
+- [ ] Create `POST /bids` endpoint
+
+```js
+/**
+ * POST /bids
+ * */
+app.post("/bids", async (req, res) => {
+  const newBid = req.body;
+  const result = await bidCollection.insertOne(newBid);
+  res.json(result);
+});
+```
