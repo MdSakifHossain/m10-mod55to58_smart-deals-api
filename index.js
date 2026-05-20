@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 import logger from "./lib/logger.js";
 
 const app = express();
@@ -45,6 +45,18 @@ async function run() {
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
       const result = await productCollection.insertOne(newProduct);
+      res.json(result);
+    });
+
+    /**
+     * DELETE /products
+     * */
+    app.delete("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await productCollection.deleteOne(query);
       res.json(result);
     });
 
