@@ -48,7 +48,7 @@ async function run() {
     // ========================================================================
 
     /**
-     * POST /products
+     *  POST /products
      * */
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
@@ -57,7 +57,7 @@ async function run() {
     });
 
     /**
-     * DELETE /products
+     *  DELETE /products/:id
      * */
     app.delete("/products/:id", async (req, res) => {
       const id = req.params.id;
