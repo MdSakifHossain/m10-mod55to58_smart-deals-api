@@ -84,6 +84,15 @@ async function run() {
       res.json(result);
     });
 
+    /**
+     *  GET /products
+     * */
+    app.get("/products", async (req, res) => {
+      const query = {};
+      const result = await productCollection.find(query).toArray();
+      res.json(result);
+    });
+
     // ========================================================================
     // ---  BIDS  -------------------------------------------------------------
     // ========================================================================
