@@ -93,6 +93,16 @@ async function run() {
       res.json(result);
     });
 
+    /**
+     *  GET /products/:id
+     * */
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productCollection.findOne(query);
+      res.json(result);
+    });
+
     // ========================================================================
     // ---  BIDS  -------------------------------------------------------------
     // ========================================================================
