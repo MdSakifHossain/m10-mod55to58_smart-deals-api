@@ -104,3 +104,25 @@ app.delete("/products/:id", async (req, res) => {
   res.json(result);
 });
 ```
+
+- [ ] Create `PATCH /products/:id` endpoint
+
+```js
+/**
+ *  PATCH /products/:id
+ * */
+app.patch("/products/:id", async (req, res) => {
+  const id = req.params.id;
+  const docFromBody = req.body;
+  const qwery = {
+    _id: new ObjectId(id),
+  };
+  const updatedDoc = {
+    $set: docFromBody,
+  };
+  const result = await productCollection.updateOne(qwery, updatedDoc);
+  res.json(result);
+});
+```
+
+- [ ]
