@@ -125,4 +125,15 @@ app.patch("/products/:id", async (req, res) => {
 });
 ```
 
-- [ ]
+- [ ] create `GET /products` endpoint
+
+```js
+/**
+ *  GET /products
+ * */
+app.get("/products", async (req, res) => {
+  const query = {};
+  const result = await productCollection.find(query).toArray();
+  res.json(result);
+});
+```
