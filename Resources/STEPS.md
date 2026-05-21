@@ -50,6 +50,8 @@ const productCollection = db.collection("products");
 const bidCollection = db.collection("bids");
 ```
 
+### Products Route
+
 - [ ] Create `POST /users` endpoint
 
 ```js
@@ -151,3 +153,5 @@ app.get("/products/:id", async (req, res) => {
   res.json(result);
 });
 ```
+
+### Bids Route
