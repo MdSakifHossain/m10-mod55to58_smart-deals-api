@@ -35,11 +35,65 @@ async function run() {
     // ========================================================================
 
     /**
-     * POST /users
+     *  POST /users
      * */
     app.post("/users", async (req, res) => {
-      const newUser = req.body;
-      const result = await userCollection.insertOne(newUser);
+      const user = req.body;
+
+      const query = {
+        firebase_uid: user.firebase_uid,
+      };
+
+      const existingUser = await userCollection.findOne(query);
+
+      if (!existingUser) {
+        const reult = await userCollection.insertOne({
+          ...user,
+          created_at: new Date(),
+          last_login: new Date(),
+        });
+
+        return res.json({
+          success: true,
+          message: "Account Created Successfully",
+          isNewUser: true,
+        });
+      }
+
+      // returning user - just update last_login
+      const result = await userCollection.updateOne(
+        query, // which to update
+        // what to update
+        {
+          $set: {
+            last_login: new Date(),
+          },
+        },
+      );
+
+      res.json({
+        success: true,
+        message: "Welcome back User",
+        isNewUser: false,
+      });
+    });
+
+    /**
+     *  GET /users
+     * */
+    app.get("/users", async (req, res) => {
+      const query = {};
+      const result = await userCollection.find(query).toArray();
+      res.json(result);
+    });
+
+    /**
+     *  GET /users/:id
+     * */
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await userCollection.findOne(query);
       res.json(result);
     });
 
