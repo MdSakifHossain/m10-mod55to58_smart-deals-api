@@ -97,6 +97,16 @@ async function run() {
       res.json(result);
     });
 
+    /**
+     *  DELETE /users/:id
+     * */
+    app.delete("/users/:id", async (req, res) => {
+      const firebase_uid = req.params.id;
+      const query = { firebase_uid };
+      const result = await userCollection.deleteOne(query);
+      res.json({ success: true, message: "Account Deleted Successfully" });
+    });
+
     // ========================================================================
     // ---  PRODUCTS  ---------------------------------------------------------
     // ========================================================================
