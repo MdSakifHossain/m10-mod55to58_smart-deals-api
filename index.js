@@ -38,6 +38,7 @@ async function run() {
      *  POST /users
      * */
     app.post("/users", async (req, res) => {
+      logger("POST /users");
       const user = req.body;
 
       const query = {
