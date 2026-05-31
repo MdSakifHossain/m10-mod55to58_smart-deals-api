@@ -83,6 +83,7 @@ async function run() {
      *  GET /users
      * */
     app.get("/users", async (req, res) => {
+      logger("GET /users");
       const query = {};
       const result = await userCollection.find(query).toArray();
       res.json(result);
@@ -92,6 +93,7 @@ async function run() {
      *  GET /users/:id
      * */
     app.get("/users/:id", async (req, res) => {
+      logger("GET /users/:id");
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await userCollection.findOne(query);
@@ -102,6 +104,7 @@ async function run() {
      *  DELETE /users/:id
      * */
     app.delete("/users/:id", async (req, res) => {
+      logger("DELETE /users/:id");
       const firebase_uid = req.params.id;
       const query = { firebase_uid };
       const result = await userCollection.deleteOne(query);
@@ -116,6 +119,7 @@ async function run() {
      *  POST /products
      * */
     app.post("/products", async (req, res) => {
+      logger("POST /products");
       const newProduct = req.body;
       const result = await productCollection.insertOne(newProduct);
       res.json(result);
@@ -125,6 +129,7 @@ async function run() {
      *  DELETE /products/:id
      * */
     app.delete("/products/:id", async (req, res) => {
+      logger("DELETE /products/:id");
       const id = req.params.id;
       const query = {
         _id: new ObjectId(id),
@@ -137,6 +142,7 @@ async function run() {
      *  PATCH /products/:id
      * */
     app.patch("/products/:id", async (req, res) => {
+      logger("PATCH /products/:id");
       const id = req.params.id;
       const docFromBody = req.body;
       const query = {
@@ -153,6 +159,7 @@ async function run() {
      *  GET /products
      * */
     app.get("/products", async (req, res) => {
+      logger("GET /products");
       const query = {};
       const result = await productCollection.find(query).toArray();
       res.json(result);
@@ -162,6 +169,7 @@ async function run() {
      *  GET /products/:id
      * */
     app.get("/products/:id", async (req, res) => {
+      logger("GET /products/:id");
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await productCollection.findOne(query);
@@ -176,6 +184,7 @@ async function run() {
      * POST /bids
      * */
     app.post("/bids", async (req, res) => {
+      logger("POST /bids");
       const newBid = req.body;
       const result = await bidCollection.insertOne(newBid);
       res.json(result);
