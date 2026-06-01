@@ -51,7 +51,6 @@ async function run() {
         const reult = await userCollection.insertOne({
           ...user,
           created_at: new Date(),
-          last_login: new Date(),
         });
 
         return res.json({
@@ -60,17 +59,6 @@ async function run() {
           isNewUser: true,
         });
       }
-
-      // returning user - just update last_login
-      const result = await userCollection.updateOne(
-        query, // which to update
-        // what to update
-        {
-          $set: {
-            last_login: new Date(),
-          },
-        },
-      );
 
       res.json({
         success: true,
