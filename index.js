@@ -39,32 +39,18 @@ async function run() {
      * */
     app.post("/users", async (req, res) => {
       logger("POST /users");
-      const user = req.body;
-
-      const query = {
-        firebase_uid: user.firebase_uid,
-      };
-
-      const existingUser = await userCollection.findOne(query);
-
-      if (!existingUser) {
-        const reult = await userCollection.insertOne({
-          ...user,
+      try {
+        await userCollection.insertOne({
+          ...req.body,
           created_at: new Date(),
         });
-
-        return res.json({
-          success: true,
-          message: "Account Created Successfully",
-          isNewUser: true,
-        });
+        res.json({ success: true, isNewUser: true });
+      } catch (err) {
+        if (err.code === 11000) {
+          return res.json({ success: true, isNewUser: false });
+        }
+        res.status(500).json({ success: false, error: err.message });
       }
-
-      res.json({
-        success: true,
-        message: "Welcome back User",
-        isNewUser: false,
-      });
     });
 
     /**
