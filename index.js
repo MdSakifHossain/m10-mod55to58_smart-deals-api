@@ -75,6 +75,24 @@ async function run() {
     });
 
     /**
+     *  PATCH /users/:uid
+     * */
+    app.patch("/users/:id", async (req, res) => {
+      logger("PATCH /users");
+      const firebase_uid = req.params.id;
+
+      const updates = {};
+      if (req.body.user_name !== undefined)
+        updates.user_name = req.body.user_name;
+      if (req.body.user_image !== undefined)
+        updates.user_image = req.body.user_image;
+
+      await userCollection.updateOne({ firebase_uid }, { $set: updates });
+
+      res.json({ success: true });
+    });
+
+    /**
      *  DELETE /users/:id
      * */
     app.delete("/users/:id", async (req, res) => {
