@@ -103,6 +103,21 @@ async function run() {
       res.json({ success: true, message: "Account Deleted Successfully" });
     });
 
+    /**
+     *  GET /users/firebase/:uid
+     * */
+    app.get("/users/firebase/:uid", async (req, res) => {
+      logger("GET /users/firebase/:uid");
+
+      const uid = req.params.uid;
+
+      const result = await userCollection.findOne({
+        firebase_uid: uid,
+      });
+
+      res.json(result);
+    });
+
     // ========================================================================
     // ---  PRODUCTS  ---------------------------------------------------------
     // ========================================================================
