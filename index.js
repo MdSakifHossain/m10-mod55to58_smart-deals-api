@@ -127,9 +127,79 @@ async function run() {
      * */
     app.post("/products", async (req, res) => {
       logger("POST /products");
-      const newProduct = req.body;
-      const result = await productCollection.insertOne(newProduct);
-      res.json(result);
+
+      try {
+        const {
+          seller_id,
+          title,
+          description,
+          image,
+          price_min,
+          category,
+          condition,
+          usage,
+        } = req.body;
+
+        // Basic validation
+        if (
+          !seller_id ||
+          !title ||
+          !description ||
+          !image ||
+          !price_min ||
+          !category ||
+          !condition
+        ) {
+          return res.status(400).json({
+            message: "Missing required fields",
+          });
+        }
+
+        if (!ObjectId.isValid(seller_id)) {
+          return res.status(400).json({
+            message: "Invalid seller_id",
+          });
+        }
+
+        if (!["fresh", "used"].includes(condition)) {
+          return res.status(400).json({
+            message: "Condition must be 'fresh' or 'used'",
+          });
+        }
+
+        const parsedPrice = Number(price_min);
+
+        if (Number.isNaN(parsedPrice)) {
+          return res.status(400).json({
+            message: "price_min must be a number",
+          });
+        }
+
+        const product = {
+          seller_id: new ObjectId(seller_id),
+          title,
+          description,
+          image,
+          status: "pending",
+          price_min: parsedPrice,
+          category,
+          condition,
+          usage: usage || null,
+          created_at: new Date(),
+        };
+
+        const result = await productCollection.insertOne(product);
+
+        res.status(201).json({
+          insertedId: result.insertedId,
+          message: "Product created successfully",
+        });
+      } catch (error) {
+        logger(error);
+        res.status(500).json({
+          message: "Internal server error",
+        });
+      }
     });
 
     /**
