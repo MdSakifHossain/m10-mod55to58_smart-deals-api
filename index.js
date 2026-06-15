@@ -247,10 +247,36 @@ async function run() {
      * */
     app.get("/products/:id", async (req, res) => {
       logger("GET /products/:id");
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await productCollection.findOne(query);
-      res.json(result);
+
+      try {
+        const id = req.params.id;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).json({
+            message: "Invalid product id",
+          });
+        }
+
+        const query = {
+          _id: new ObjectId(id),
+        };
+
+        const product = await productCollection.findOne(query);
+
+        if (!product) {
+          return res.status(404).json({
+            message: "Product not found",
+          });
+        }
+
+        res.status(200).json(product);
+      } catch (error) {
+        logger(error);
+
+        res.status(500).json({
+          message: "Internal server error",
+        });
+      }
     });
 
     // ========================================================================
