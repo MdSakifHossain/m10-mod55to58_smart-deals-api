@@ -279,6 +279,29 @@ async function run() {
       }
     });
 
+    /**
+     *  GET /latest-products
+     * */
+    app.get("/latest-products", async (req, res) => {
+      logger("GET /latest-products");
+
+      try {
+        const products = await productCollection
+          .find({ status: "pending" })
+          .sort({ created_at: -1 })
+          .limit(6)
+          .toArray();
+
+        res.status(200).json(products);
+      } catch (error) {
+        logger(error);
+
+        res.status(500).json({
+          message: "Failed to fetch latest products",
+        });
+      }
+    });
+
     // ========================================================================
     // ---  BIDS  -------------------------------------------------------------
     // ========================================================================
