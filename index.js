@@ -355,6 +355,37 @@ async function run() {
         });
       }
     });
+
+    app.get("/products/:productId/bids", async (req, res) => {
+      try {
+        logger("GET /products/:productId/bids");
+
+        const { productId } = req.params;
+
+        if (!ObjectId.isValid(productId)) {
+          return res.status(400).json({
+            message: "Invalid product ID",
+          });
+        }
+
+        const bids = await bidCollection
+          .find({
+            product_id: new ObjectId(productId),
+          })
+          .sort({
+            bid_price: -1,
+          })
+          .toArray();
+
+        res.json(bids);
+      } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+          message: "Failed to fetch bids",
+        });
+      }
+    });
   } finally {
     // await client.close();
   }
