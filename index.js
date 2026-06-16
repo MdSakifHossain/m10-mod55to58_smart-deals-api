@@ -310,10 +310,50 @@ async function run() {
      * POST /bids
      * */
     app.post("/bids", async (req, res) => {
-      logger("POST /bids");
-      const newBid = req.body;
-      const result = await bidCollection.insertOne(newBid);
-      res.json(result);
+      try {
+        logger("POST /bids");
+        const { buyer_id, product_id, bid_price } = req.body;
+
+        // Required field validation
+        if (!buyer_id || !product_id || bid_price === undefined) {
+          return res.status(400).json({
+            message: "buyer_id, product_id and bid_price are required",
+          });
+        }
+
+        // ObjectId validation
+        if (!ObjectId.isValid(buyer_id) || !ObjectId.isValid(product_id)) {
+          return res.status(400).json({
+            message: "Invalid buyer_id or product_id",
+          });
+        }
+
+        // Price validation
+        if (typeof bid_price !== "number" || bid_price <= 0) {
+          return res.status(400).json({
+            message: "bid_price must be a positive number",
+          });
+        }
+
+        const newBid = {
+          buyer_id: new ObjectId(buyer_id),
+          product_id: new ObjectId(product_id),
+          bid_price,
+          status: "pending",
+          created_at: new Date(),
+        };
+        const result = await bidCollection.insertOne(newBid);
+        res.status(201).json({
+          message: "Bid created successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+          message: "Failed to create bid",
+        });
+      }
     });
   } finally {
     // await client.close();
