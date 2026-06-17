@@ -315,30 +315,29 @@ async function run() {
 
         const { buyer_id, product_id, bid_price } = req.body;
 
-        // Required field validation
         if (!buyer_id || !product_id || bid_price === undefined) {
           return res.status(400).json({
             message: "buyer_id, product_id and bid_price are required",
           });
         }
 
-        // ObjectId validation
         if (!ObjectId.isValid(buyer_id) || !ObjectId.isValid(product_id)) {
           return res.status(400).json({
             message: "Invalid buyer_id or product_id",
           });
         }
 
-        // Price validation
         if (typeof bid_price !== "number" || bid_price <= 0) {
           return res.status(400).json({
             message: "bid_price must be a positive number",
           });
         }
 
-        // Fetch product
+        const buyerObjectId = new ObjectId(buyer_id);
+        const productObjectId = new ObjectId(product_id);
+
         const product = await productCollection.findOne({
-          _id: new ObjectId(product_id),
+          _id: productObjectId,
         });
 
         if (!product) {
@@ -347,16 +346,29 @@ async function run() {
           });
         }
 
-        // Seller cannot bid on own product
-        if (product.seller_id?.toString() === buyer_id) {
+        if (product.seller_id.toString() === buyer_id) {
           return res.status(403).json({
             message: "You cannot bid on your own product",
           });
         }
 
+        const highestBid = await bidCollection
+          .find({ product_id: productObjectId })
+          .sort({ bid_price: -1 })
+          .limit(1)
+          .toArray();
+
+        const currentHighest = highestBid[0]?.bid_price || 0;
+
+        if (bid_price <= currentHighest) {
+          return res.status(400).json({
+            message: `Bid must be higher than current highest bid (${currentHighest})`,
+          });
+        }
+
         const newBid = {
-          buyer_id: new ObjectId(buyer_id),
-          product_id: new ObjectId(product_id),
+          buyer_id: buyerObjectId,
+          product_id: productObjectId,
           bid_price,
           status: "pending",
           created_at: new Date(),
@@ -364,14 +376,14 @@ async function run() {
 
         const result = await bidCollection.insertOne(newBid);
 
-        res.status(201).json({
+        return res.status(201).json({
           message: "Bid created successfully",
           insertedId: result.insertedId,
         });
       } catch (error) {
         console.error(error);
 
-        res.status(500).json({
+        return res.status(500).json({
           message: "Failed to create bid",
         });
       }
