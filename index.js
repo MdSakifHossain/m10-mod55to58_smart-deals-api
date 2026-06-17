@@ -312,6 +312,7 @@ async function run() {
     app.post("/bids", async (req, res) => {
       try {
         logger("POST /bids");
+
         const { buyer_id, product_id, bid_price } = req.body;
 
         // Required field validation
@@ -335,6 +336,24 @@ async function run() {
           });
         }
 
+        // Fetch product
+        const product = await productCollection.findOne({
+          _id: new ObjectId(product_id),
+        });
+
+        if (!product) {
+          return res.status(404).json({
+            message: "Product not found",
+          });
+        }
+
+        // Seller cannot bid on own product
+        if (product.seller_id?.toString() === buyer_id) {
+          return res.status(403).json({
+            message: "You cannot bid on your own product",
+          });
+        }
+
         const newBid = {
           buyer_id: new ObjectId(buyer_id),
           product_id: new ObjectId(product_id),
@@ -342,7 +361,9 @@ async function run() {
           status: "pending",
           created_at: new Date(),
         };
+
         const result = await bidCollection.insertOne(newBid);
+
         res.status(201).json({
           message: "Bid created successfully",
           insertedId: result.insertedId,
