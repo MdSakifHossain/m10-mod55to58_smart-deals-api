@@ -280,6 +280,44 @@ async function run() {
     });
 
     /**
+     *  GET /my_products?user_id=...
+     * */
+    app.get("/my_products", async (req, res) => {
+      try {
+        logger("GET /products/my");
+
+        const { user_id } = req.query;
+
+        if (!user_id) {
+          return res.status(400).json({
+            message: "user_id is required",
+          });
+        }
+
+        if (!ObjectId.isValid(user_id)) {
+          return res.status(400).json({
+            message: "Invalid user_id",
+          });
+        }
+
+        const products = await productCollection
+          .find({
+            seller_id: new ObjectId(user_id),
+          })
+          .sort({ created_at: -1 })
+          .toArray();
+
+        res.status(200).json(products);
+      } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+          message: "Failed to fetch your products",
+        });
+      }
+    });
+
+    /**
      *  GET /latest-products
      * */
     app.get("/latest-products", async (req, res) => {
