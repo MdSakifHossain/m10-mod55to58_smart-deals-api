@@ -356,34 +356,37 @@ async function run() {
       }
     });
 
+    const getUsersByIds = async (ids) => {
+      const objectIds = ids.map((id) => new ObjectId(id));
+
+      return userCollection.find({ _id: { $in: objectIds } }).toArray();
+    };
+
     app.get("/products/:productId/bids", async (req, res) => {
       try {
-        logger("GET /products/:productId/bids");
-
         const { productId } = req.params;
 
         if (!ObjectId.isValid(productId)) {
-          return res.status(400).json({
-            message: "Invalid product ID",
-          });
+          return res.status(400).json({ message: "Invalid product ID" });
         }
 
         const bids = await bidCollection
-          .find({
-            product_id: new ObjectId(productId),
-          })
-          .sort({
-            bid_price: -1,
-          })
+          .find({ product_id: new ObjectId(productId) })
+          .sort({ bid_price: -1 })
           .toArray();
 
-        res.json(bids);
-      } catch (error) {
-        console.error(error);
+        const buyerIds = [...new Set(bids.map((b) => b.buyer_id.toString()))];
+        const buyers = await getUsersByIds(buyerIds);
+        const buyersMap = new Map(buyers.map((b) => [b._id.toString(), b]));
 
-        res.status(500).json({
-          message: "Failed to fetch bids",
-        });
+        const enriched = bids.map((bid) => ({
+          ...bid,
+          buyer: buyersMap.get(bid.buyer_id.toString()),
+        }));
+
+        res.json(enriched);
+      } catch (err) {
+        res.status(500).json({ message: "Failed" });
       }
     });
   } finally {
