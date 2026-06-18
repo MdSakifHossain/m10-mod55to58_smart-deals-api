@@ -205,14 +205,70 @@ async function run() {
     /**
      *  DELETE /products/:id
      * */
-    app.delete("/products/:id", async (req, res) => {
-      logger("DELETE /products/:id");
-      const id = req.params.id;
-      const query = {
-        _id: new ObjectId(id),
-      };
-      const result = await productCollection.deleteOne(query);
-      res.json(result);
+    app.delete("/products/:productId", async (req, res) => {
+      try {
+        logger("DELETE /products/:productId");
+
+        const { productId } = req.params;
+        const { user_id } = req.body;
+
+        if (!ObjectId.isValid(productId)) {
+          return res.status(400).json({
+            message: "Invalid product ID",
+          });
+        }
+
+        if (!user_id) {
+          return res.status(400).json({
+            message: "user_id is required",
+          });
+        }
+
+        if (!ObjectId.isValid(user_id)) {
+          return res.status(400).json({
+            message: "Invalid user_id",
+          });
+        }
+
+        const product = await productCollection.findOne({
+          _id: new ObjectId(productId),
+        });
+
+        if (!product) {
+          return res.status(404).json({
+            message: "Product not found",
+          });
+        }
+
+        // Ownership check
+        if (product.seller_id.toString() !== user_id) {
+          return res.status(403).json({
+            message: "You are not allowed to delete this product",
+          });
+        }
+
+        // Delete all bids first
+        const bidDeleteResult = await bidCollection.deleteMany({
+          product_id: new ObjectId(productId),
+        });
+
+        // Delete product
+        const productDeleteResult = await productCollection.deleteOne({
+          _id: new ObjectId(productId),
+        });
+
+        return res.status(200).json({
+          message: "Product deleted successfully",
+          deletedProductCount: productDeleteResult.deletedCount,
+          deletedBidCount: bidDeleteResult.deletedCount,
+        });
+      } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+          message: "Failed to delete product",
+        });
+      }
     });
 
     /**
