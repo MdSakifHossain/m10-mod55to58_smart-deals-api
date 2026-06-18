@@ -284,7 +284,7 @@ async function run() {
      * */
     app.get("/my_products", async (req, res) => {
       try {
-        logger("GET /products/my");
+        logger("GET /my_products");
 
         const { user_id } = req.query;
 
