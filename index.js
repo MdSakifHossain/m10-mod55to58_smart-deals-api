@@ -294,7 +294,10 @@ async function run() {
     app.get("/products", async (req, res) => {
       logger("GET /products");
       const query = {};
-      const result = await productCollection.find(query).toArray();
+      const result = await productCollection
+        .find(query)
+        .sort({ created_at: -1 })
+        .toArray();
       res.json(result);
     });
 
