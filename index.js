@@ -492,6 +492,9 @@ async function run() {
       return userCollection.find({ _id: { $in: objectIds } }).toArray();
     };
 
+    /**
+     * GET /products/:productID/bids
+     * */
     app.get("/products/:productId/bids", async (req, res) => {
       try {
         const { productId } = req.params;
