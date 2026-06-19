@@ -609,6 +609,67 @@ async function run() {
         });
       }
     });
+
+    /**
+     * DELETE /bids/:bidId
+     * */
+    app.delete("/bids/:bidId", async (req, res) => {
+      try {
+        logger("DELETE /bids/:bidId");
+
+        const { bidId } = req.params;
+        const { user_id } = req.body;
+
+        if (!ObjectId.isValid(bidId)) {
+          return res.status(400).json({
+            message: "Invalid bid ID",
+          });
+        }
+
+        if (!user_id) {
+          return res.status(400).json({
+            message: "user_id is required",
+          });
+        }
+
+        if (!ObjectId.isValid(user_id)) {
+          return res.status(400).json({
+            message: "Invalid user_id",
+          });
+        }
+
+        const bid = await bidCollection.findOne({
+          _id: new ObjectId(bidId),
+        });
+
+        if (!bid) {
+          return res.status(404).json({
+            message: "Bid not found",
+          });
+        }
+
+        // Ownership check
+        if (bid.buyer_id.toString() !== user_id) {
+          return res.status(403).json({
+            message: "You are not allowed to delete this bid",
+          });
+        }
+
+        await bidCollection.deleteOne({
+          _id: new ObjectId(bidId),
+        });
+
+        res.status(200).json({
+          message: "Bid deleted successfully",
+        });
+      } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+          message: "Failed to delete bid",
+        });
+      }
+    });
   } finally {
     // await client.close();
   }
