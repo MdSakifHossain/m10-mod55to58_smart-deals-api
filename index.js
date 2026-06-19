@@ -522,6 +522,93 @@ async function run() {
         res.status(500).json({ message: "Failed" });
       }
     });
+
+    /**
+     * GET /my_bids?user_id=...
+     * */
+    app.get("/my_bids", async (req, res) => {
+      try {
+        logger("GET /my_bids");
+
+        const { user_id } = req.query;
+
+        if (!user_id) {
+          return res.status(400).json({
+            message: "user_id is required",
+          });
+        }
+
+        if (!ObjectId.isValid(user_id)) {
+          return res.status(400).json({
+            message: "Invalid user_id",
+          });
+        }
+
+        const bids = await bidCollection
+          .find({
+            buyer_id: new ObjectId(user_id),
+          })
+          .sort({
+            created_at: -1,
+          })
+          .toArray();
+
+        const productIds = [
+          ...new Set(bids.map((bid) => bid.product_id.toString())),
+        ];
+
+        const products = await productCollection
+          .find({
+            _id: {
+              $in: productIds.map((id) => new ObjectId(id)),
+            },
+          })
+          .toArray();
+
+        const sellerIds = [
+          ...new Set(products.map((product) => product.seller_id.toString())),
+        ];
+
+        const sellers = await userCollection
+          .find({
+            _id: {
+              $in: sellerIds.map((id) => new ObjectId(id)),
+            },
+          })
+          .toArray();
+
+        const sellersMap = new Map(
+          sellers.map((seller) => [seller._id.toString(), seller]),
+        );
+
+        const productsMap = new Map(
+          products.map((product) => [
+            product._id.toString(),
+            {
+              ...product,
+              seller: sellersMap.get(product.seller_id.toString()),
+            },
+          ]),
+        );
+
+        const enrichedBids = bids.map((bid) => ({
+          _id: bid._id,
+          bid_price: bid.bid_price,
+          status: bid.status,
+          created_at: bid.created_at,
+
+          product: productsMap.get(bid.product_id.toString()),
+        }));
+
+        res.status(200).json(enrichedBids);
+      } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+          message: "Failed to fetch your bids",
+        });
+      }
+    });
   } finally {
     // await client.close();
   }
