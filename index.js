@@ -20,6 +20,16 @@ const client = new MongoClient(uri, {
   },
 });
 
+const varifyFirebaseToken = (req, res, next) => {
+  if (!req.headers.authorization) {
+    return res.status(401).send({ message: `Unauthorized Access` });
+  }
+
+  const token = req.headers.authorization.split(" ")[1];
+  console.log({ token });
+  next();
+};
+
 async function run() {
   try {
     await client.connect();
@@ -341,7 +351,7 @@ async function run() {
     /**
      *  GET /my_products?user_id=...
      * */
-    app.get("/my_products", async (req, res) => {
+    app.get("/my_products", varifyFirebaseToken, async (req, res) => {
       try {
         logger("GET /my_products");
 
