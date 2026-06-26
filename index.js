@@ -3,9 +3,16 @@ import express from "express";
 import cors from "cors";
 import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 import logger from "./lib/logger.js";
+import { initializeApp, cert } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
+import serviceAccount from "./m10-smart-deals-firebase-adminsdk.json" with { type: "json" };
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+initializeApp({
+  credential: cert(serviceAccount),
+});
 
 app.use(cors());
 app.use(express.json());
@@ -20,14 +27,25 @@ const client = new MongoClient(uri, {
   },
 });
 
-const varifyFirebaseToken = (req, res, next) => {
+const varifyFirebaseToken = async (req, res, next) => {
   if (!req.headers.authorization) {
     return res.status(401).send({ message: `Unauthorized Access` });
   }
 
   const token = req.headers.authorization.split(" ")[1];
-  console.log({ token });
-  next();
+
+  if (!token) {
+    return res.status(401).send({ message: `Unauthorized Access` });
+  }
+
+  try {
+    const decoded = await getAuth().verifyIdToken(token);
+    req.decoded = decoded;
+    next();
+  } catch (err) {
+    console.error("Invalid Token");
+    return res.status(401).send({ message: `Unauthorized Access` });
+  }
 };
 
 async function run() {
