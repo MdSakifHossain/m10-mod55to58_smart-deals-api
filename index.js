@@ -153,7 +153,7 @@ async function run() {
     /**
      *  POST /products
      * */
-    app.post("/products", async (req, res) => {
+    app.post("/products", varifyFirebaseToken, async (req, res) => {
       logger("POST /products");
 
       try {
