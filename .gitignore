@@ -6,3 +6,4 @@ node_modules
 
 # Firebase admin sdk kay
 m10-smart-deals-firebase-adminsdk.json
+.vercel
