@@ -5,7 +5,12 @@ import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 import logger from "./lib/logger.js";
 import { initializeApp, cert } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import serviceAccount from "./m10-smart-deals-firebase-adminsdk.json" with { type: "json" };
+
+const decoded = Buffer.from(
+  process.env.FIREBASE_SERVICE_KEY,
+  "base64",
+).toString("utf8");
+const serviceAccount = JSON.parse(decoded);
 
 const app = express();
 const port = process.env.PORT || 3000;
